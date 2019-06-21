@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli"
 
 	"github.com/jacekk/dead-simple-proxy-server/pkg/helpers"
+	"github.com/jacekk/dead-simple-proxy-server/pkg/routing"
 )
 
 var projectDir string
@@ -39,9 +40,8 @@ func runApp() {
 			Usage:   "Runs server",
 			Action: func(c *cli.Context) error {
 				port := os.Getenv("SERVER_PORT")
-				log.Printf("Server port: %s \n", port)
 
-				return nil
+				return routing.InitRouter(port)
 			},
 		},
 	}
