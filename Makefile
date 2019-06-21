@@ -6,5 +6,11 @@ help:
 build:
 	go build cmd/main.go
 
-run:
-	go run cmd/main.go
+serve:
+	go run cmd/main.go server
+
+migrate-up:
+	go run cmd/main.go migrate up
+
+migrate-down:
+	go run cmd/main.go migrate down
