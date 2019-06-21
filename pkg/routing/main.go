@@ -30,6 +30,7 @@ func SetupRouter() *gin.Engine {
 	gin.SetMode(os.Getenv("GIN_MODE"))
 	router := configureCors(gin.Default())
 
+	router.GET("/proxy/:slug", GetProxyBySlug)
 	ping := router.Group("/ping")
 	{
 		ping.GET("", GetPingRoute)
