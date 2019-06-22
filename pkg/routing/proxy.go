@@ -3,6 +3,8 @@ package routing
 import (
 	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +19,18 @@ func isSlugValid(slug string) error {
 		validation.Length(4, 50),
 		validation.Match(regexp.MustCompile("^[a-z0-9-]+$")),
 	)
+}
+
+func initURLProxy(parsedURL *url.URL, ctx *gin.Context) {
+	req := ctx.Request
+
+	req.URL.Host = parsedURL.Host
+	req.URL.Scheme = parsedURL.Scheme
+	req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
+	req.Host = parsedURL.Host
+
+	proxy := httputil.NewSingleHostReverseProxy(parsedURL)
+	proxy.ServeHTTP(ctx.Writer, req)
 }
 
 // GetProxyBySlug - uses slug to serve certain URL.
@@ -34,5 +48,11 @@ func GetProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	ctx.String(http.StatusOK, storedURL)
+	parsedURL, err := url.Parse(storedURL)
+	if err != nil {
+		ctx.String(http.StatusBadGateway, "Wrong URL linked with this slug.")
+		return
+	}
+
+	initURLProxy(parsedURL, ctx)
 }
