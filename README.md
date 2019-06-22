@@ -7,5 +7,4 @@
 ### Running
 
 1. `cp dist.env .env` -- and edit if necessary
-<!-- 1. `make migrate-up` -->
 1. `make serve`
