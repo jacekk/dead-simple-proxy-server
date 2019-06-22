@@ -7,6 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation"
+
+	"github.com/jacekk/dead-simple-proxy-server/pkg/storage"
 )
 
 func isSlugValid(slug string) error {
@@ -26,5 +28,11 @@ func GetProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	ctx.String(http.StatusOK, slug)
+	storedURL := storage.GetProxyBySlug(slug)
+	if storedURL == "" {
+		ctx.String(http.StatusBadRequest, "Slug not found.")
+		return
+	}
+
+	ctx.String(http.StatusOK, storedURL)
 }
