@@ -21,16 +21,17 @@ func isSlugValid(slug string) error {
 	)
 }
 
-func initURLProxy(parsedURL *url.URL, ctx *gin.Context) {
-	req := ctx.Request
-
-	req.URL.Host = parsedURL.Host
-	req.URL.Scheme = parsedURL.Scheme
-	req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-	req.Host = parsedURL.Host
-
-	proxy := httputil.NewSingleHostReverseProxy(parsedURL)
-	proxy.ServeHTTP(ctx.Writer, req)
+func initURLProxy(ctx *gin.Context, parsedURL *url.URL) {
+	director := func(req *http.Request) {
+		req.Host = "" // this is required for some unknown reasons
+		req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
+		req.URL.Host = parsedURL.Host
+		req.URL.Path = parsedURL.Path
+		req.URL.RawQuery = parsedURL.RawQuery
+		req.URL.Scheme = parsedURL.Scheme
+	}
+	proxy := &httputil.ReverseProxy{Director: director}
+	proxy.ServeHTTP(ctx.Writer, ctx.Request)
 }
 
 // GetProxyBySlug - uses slug to serve certain URL.
@@ -54,5 +55,5 @@ func GetProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	initURLProxy(parsedURL, ctx)
+	initURLProxy(ctx, parsedURL)
 }

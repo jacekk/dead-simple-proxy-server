@@ -1,0 +1,4 @@
+{
+	"example": "https://example.com/",
+	"self-ping": "http://localhost:8080/ping"
+}

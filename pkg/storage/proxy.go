@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,13 +12,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-const configPath = "storage/proxy-config.json"
+const configPathEnv = "PROXY_CONFIG_PATH"
 
 type proxyConfig map[string]string
 
 // @todo replace with (sqlite) database.
 func readConfig() (proxyConfig, error) {
 	var config proxyConfig
+
+	configPath := os.Getenv(configPathEnv)
+	if configPath == "" {
+		errMsg := fmt.Sprintf("Proxy config path is not set via '%s' system variable.", configPathEnv)
+		return config, errors.New(errMsg)
+	}
 
 	fullPath := path.Join(helpers.GetProjectDir(), configPath)
 	jsonFile, err := os.Open(fullPath)
