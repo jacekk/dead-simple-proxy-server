@@ -43,13 +43,13 @@ func GetProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	storedURL := storage.GetProxyBySlug(slug)
-	if storedURL == "" {
+	storedItem, err := storage.GetProxyBySlug(slug)
+	if err != nil {
 		ctx.String(http.StatusBadRequest, "Slug not found.")
 		return
 	}
 
-	parsedURL, err := url.Parse(storedURL)
+	parsedURL, err := url.Parse(storedItem.URL)
 	if err != nil {
 		ctx.String(http.StatusBadGateway, "Wrong URL linked with this slug.")
 		return

@@ -14,7 +14,11 @@ import (
 
 const configPathEnv = "PROXY_CONFIG_PATH"
 
-type proxyConfig map[string]string
+type ConfigItem struct {
+	URL string `json:"url"`
+}
+
+type proxyConfig map[string]ConfigItem
 
 // @todo replace with (sqlite) database.
 func readConfig() (proxyConfig, error) {
@@ -47,13 +51,13 @@ func readConfig() (proxyConfig, error) {
 }
 
 // GetProxyBySlug - returns URL based on given slug
-func GetProxyBySlug(slug string) string {
+func GetProxyBySlug(slug string) (ConfigItem, error) {
 	config, err := readConfig()
 	if err != nil {
 		log.Printf("%+v", errors.Wrap(err, "failed to read and parse proxy config"))
 
-		return ""
+		return ConfigItem{}, err
 	}
 
-	return config[slug]
+	return config[slug], nil
 }
