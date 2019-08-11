@@ -70,7 +70,7 @@ func getProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	storedItem, err := storage.GetProxyBySlug(slug)
+	storedItem, err := storage.GetProxyConfigBySlug(slug)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, "Slug not found.")
 		return
