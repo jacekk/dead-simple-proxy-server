@@ -8,6 +8,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"regexp"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -60,6 +61,10 @@ func initURLProxy(
 			}
 		}
 		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+		if !isCompressed {
+			resp.ContentLength = int64(len(body))
+			resp.Header.Set("Content-Length", strconv.Itoa(len(body)))
+		}
 
 		return nil
 	}
