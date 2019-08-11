@@ -62,8 +62,7 @@ func initURLProxy(ctx *gin.Context, parsedURL *url.URL) {
 	proxy.ServeHTTP(ctx.Writer, ctx.Request)
 }
 
-// GetProxyBySlug - uses slug to serve certain URL.
-func GetProxyBySlug(ctx *gin.Context) {
+func getProxyBySlug(ctx *gin.Context) {
 	slug := ctx.Param("slug")
 	if err := isSlugValid(slug); err != nil {
 		msg := fmt.Sprintf("Given 'slug' is NOT valid --> %s.", err)
