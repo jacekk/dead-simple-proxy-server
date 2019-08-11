@@ -1,7 +1,9 @@
 package routing
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -10,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation"
 
+	"github.com/jacekk/dead-simple-proxy-server/pkg/compression"
+	"github.com/jacekk/dead-simple-proxy-server/pkg/helpers"
 	"github.com/jacekk/dead-simple-proxy-server/pkg/storage"
 )
 
@@ -30,7 +34,31 @@ func initURLProxy(ctx *gin.Context, parsedURL *url.URL) {
 		req.URL.RawQuery = parsedURL.RawQuery
 		req.URL.Scheme = parsedURL.Scheme
 	}
-	proxy := &httputil.ReverseProxy{Director: director}
+	responseModifier := func(resp *http.Response) error {
+		isCompressed := resp.Uncompressed == false
+		body, err := helpers.ReadResponseBody(resp)
+		if err != nil {
+			return err
+		}
+		if isCompressed {
+			body, err = compression.UngzipBytes(body)
+			if err != nil {
+				return err
+			}
+		}
+		body = bytes.Replace(body, []byte("__NEEDLE__"), []byte("__REPLACED__"), -1)
+		if isCompressed {
+			body, err = compression.GzipBytes(body)
+			if err != nil {
+				return err
+			}
+		}
+		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+		return nil
+	}
+
+	proxy := &httputil.ReverseProxy{Director: director, ModifyResponse: responseModifier}
 	proxy.ServeHTTP(ctx.Writer, ctx.Request)
 }
 
