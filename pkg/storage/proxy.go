@@ -14,8 +14,10 @@ import (
 
 const configPathEnv = "PROXY_CONFIG_PATH"
 
+// ConfigItem -
 type ConfigItem struct {
-	URL string `json:"url"`
+	URL         string            `json:"url"`
+	BodyRewrite map[string]string `json:"bodyRewrite"`
 }
 
 type proxyConfig map[string]ConfigItem

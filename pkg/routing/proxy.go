@@ -25,7 +25,11 @@ func isSlugValid(slug string) error {
 	)
 }
 
-func initURLProxy(ctx *gin.Context, parsedURL *url.URL) {
+func initURLProxy(
+	ctx *gin.Context,
+	parsedURL *url.URL,
+	config storage.ConfigItem,
+) {
 	director := func(req *http.Request) {
 		req.Host = "" // this is required for some unknown reasons
 		req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
@@ -46,7 +50,9 @@ func initURLProxy(ctx *gin.Context, parsedURL *url.URL) {
 				return err
 			}
 		}
-		body = bytes.Replace(body, []byte("__NEEDLE__"), []byte("__REPLACED__"), -1)
+		for from, to := range config.BodyRewrite {
+			body = bytes.Replace(body, []byte(from), []byte(to), -1)
+		}
 		if isCompressed {
 			body, err = compression.GzipBytes(body)
 			if err != nil {
@@ -82,5 +88,5 @@ func getProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	initURLProxy(ctx, parsedURL)
+	initURLProxy(ctx, parsedURL, storedItem)
 }
