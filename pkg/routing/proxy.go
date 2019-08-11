@@ -35,7 +35,7 @@ func initURLProxy(ctx *gin.Context, parsedURL *url.URL) {
 		req.URL.Scheme = parsedURL.Scheme
 	}
 	responseModifier := func(resp *http.Response) error {
-		isCompressed := resp.Uncompressed == false
+		isCompressed := helpers.IsResponseCompressed(resp)
 		body, err := helpers.ReadResponseBody(resp)
 		if err != nil {
 			return err
