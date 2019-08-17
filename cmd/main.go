@@ -40,7 +40,7 @@ func runApp() {
 			Aliases: []string{"w", "work"},
 			Usage:   "Runs worker",
 			Action: func(ctx *cli.Context) error {
-				return worker.Init()
+				return worker.InitWorker()
 			},
 		},
 		{
@@ -48,7 +48,6 @@ func runApp() {
 			Usage: "Runs worker and server",
 			Action: func(ctx *cli.Context) error {
 				var wg sync.WaitGroup
-				wg.Add(2)
 
 				go func() {
 					defer wg.Done()
@@ -56,9 +55,10 @@ func runApp() {
 				}()
 				go func() {
 					defer wg.Done()
-					log.Fatal(worker.Init())
+					log.Fatal(worker.InitWorker())
 				}()
 
+				wg.Add(2)
 				wg.Wait()
 
 				return nil
