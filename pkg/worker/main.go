@@ -2,25 +2,30 @@ package worker
 
 import (
 	"bufio"
-	"log"
+	"fmt"
 	"os"
 	"time"
 )
 
 const prefix = "[WORKER]"
 
+func info(format string, args ...interface{}) {
+	prefixedFormat := fmt.Sprintf("%s %s \n", prefix, format)
+	fmt.Fprintf(os.Stdout, prefixedFormat, args...)
+}
+
 // Init -
 func Init() error {
-	log.Printf("%s Starting ...", prefix)
+	info("Starting ...")
 
 	go func() {
 		for {
 			time.Sleep(time.Second * 10)
-			log.Printf("%s tick ", prefix)
+			info("tick")
 		}
 	}()
 
-	log.Printf("%s Press 'Enter' to exit ...", prefix)
+	info("Press 'Enter' to exit ...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 
 	return nil
