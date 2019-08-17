@@ -8,9 +8,3 @@ build:
 
 serve:
 	go run cmd/main.go server
-
-migrate-up:
-	go run cmd/main.go migrate up
-
-migrate-down:
-	go run cmd/main.go migrate down

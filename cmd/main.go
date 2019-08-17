@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 	"os"
 
@@ -26,14 +25,6 @@ func runApp() {
 	app := cli.NewApp()
 
 	app.Commands = []cli.Command{
-		{
-			Name:    "migrate",
-			Aliases: []string{"m"},
-			Usage:   "Runs migrations up or down",
-			Action: func(c *cli.Context) error {
-				return errors.New("@todo migrate command")
-			},
-		},
 		{
 			Name:    "server",
 			Aliases: []string{"s", "serve"},
