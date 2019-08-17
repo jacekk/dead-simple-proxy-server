@@ -8,3 +8,9 @@ build:
 
 serve:
 	go run cmd/main.go server
+
+worker:
+	go run cmd/main.go worker
+
+work-and-serve:
+	go run cmd/main.go --worker --server
