@@ -32,7 +32,7 @@ func runApp() {
 			Aliases: []string{"s", "serve"},
 			Usage:   "Runs server",
 			Action: func(ctx *cli.Context) error {
-				return routing.InitRouter(os.Getenv("SERVER_PORT"))
+				return routing.InitRouter()
 			},
 		},
 		{
@@ -52,7 +52,7 @@ func runApp() {
 
 				go func() {
 					defer wg.Done()
-					log.Fatal(routing.InitRouter(os.Getenv("SERVER_PORT")))
+					log.Fatal(routing.InitRouter())
 				}()
 				go func() {
 					defer wg.Done()

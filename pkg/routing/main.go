@@ -41,8 +41,9 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-// InitRouter - initializes Gin router and runs it on given port.
-func InitRouter(port string) error {
+// InitRouter - initializes Gin router and runs it.
+func InitRouter() error {
+	port := os.Getenv("SERVER_PORT")
 	router := SetupRouter()
 	err := router.Run(fmt.Sprintf(":%s", port))
 	if err != nil {
