@@ -1,5 +1,12 @@
 # Dead Simple Proxy Server
 
+Almost dead simple.
+
+First iteration just allowed to configure urls to redirect to.
+The next to rewrite body content of proxied urls.
+The current version allows to precache urls based on configured interval.
+In case of errors while refreshing the cache, the last succesful response is being served.
+
 ### Requirements
 
 * [Go](https://golang.org/doc/install) [ >=1.12 ]
