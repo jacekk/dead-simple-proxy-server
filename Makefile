@@ -6,11 +6,11 @@ help:
 build:
 	go build cmd/main.go
 
-serve:
+server:
 	go run cmd/main.go server
 
 worker:
 	go run cmd/main.go worker
 
-work-and-serve:
-	go run cmd/main.go --worker --server
+run-all:
+	go run cmd/main.go all
