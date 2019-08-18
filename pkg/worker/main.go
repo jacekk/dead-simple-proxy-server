@@ -1,8 +1,6 @@
 package worker
 
 import (
-	"fmt"
-	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -13,21 +11,10 @@ import (
 const loggerPrefix = "[WORKER]"
 const sleepVarName = "WORKER_SLEEP_SECONDS"
 
-var random *rand.Rand
-
-func init() {
-	s1 := rand.NewSource(time.Now().UnixNano())
-	random = rand.New(s1)
-}
-
-func info(baseFormat string, args ...interface{}) {
-	format := fmt.Sprintf("%s %s \n", loggerPrefix, baseFormat)
-	fmt.Fprintf(os.Stdout, format, args...)
-}
-
 // InitWorker -
 func InitWorker() error {
-	info("Starting ...")
+	loggr := new(loggerImpl)
+	loggr.Info("Starting ...")
 	workerErr := make(chan error)
 	defer close(workerErr)
 
@@ -36,17 +23,15 @@ func InitWorker() error {
 		return errors.Wrapf(err, "failed to parsed '%s' ", sleepVarName)
 	}
 
-	info("Will run every %d seconds", sleepTime)
+	loggr.Info("Will run every %d seconds", sleepTime)
 
 	go func() {
 		for {
 			time.Sleep(time.Second * time.Duration(sleepTime))
-			randomNumber := random.Intn(100)
-			if randomNumber > 90 {
-				workerErr <- fmt.Errorf("random number is '%d' so above 90", randomNumber)
-				continue
+			err := refreshRandomCache(loggr)
+			if err != nil {
+				workerErr <- err
 			}
-			info("tick %d", randomNumber)
 		}
 	}()
 

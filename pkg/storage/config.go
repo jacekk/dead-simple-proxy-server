@@ -13,17 +13,19 @@ import (
 
 const configPathEnv = "PROXY_CONFIG_PATH"
 
-// ConfigItem -
-type ConfigItem struct {
-	URL         string            `json:"url"`
-	BodyRewrite map[string]string `json:"bodyRewrite"`
+// Item -
+type Item struct {
+	BodyRewrite    map[string]string `json:"bodyRewrite"`
+	ID             string            `json:"id"`
+	IsCacheEnabled bool              `json:"isCacheEnabled"`
+	URL            string            `json:"url"`
 }
 
-type proxyConfig map[string]ConfigItem
+// Items -
+type Items []Item
 
-// @todo replace with (sqlite) database.
-func readConfig() (proxyConfig, error) {
-	var config proxyConfig
+func readConfig() (Items, error) {
+	var config Items
 
 	configPath := os.Getenv(configPathEnv)
 	if configPath == "" {

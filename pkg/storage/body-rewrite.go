@@ -16,8 +16,8 @@ func GetBodyRewriteSource(id string) (string, error) {
 		return "", err
 	}
 
-	for _, configItem := range config {
-		for key, value := range configItem.BodyRewrite {
+	for _, item := range config {
+		for key, value := range item.BodyRewrite {
 			if strings.Contains(value, id) {
 				return key, nil
 			}

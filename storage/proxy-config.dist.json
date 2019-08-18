@@ -1,15 +1,17 @@
-{
-	"example": {
+[
+	{
+		"id": "example",
 		"url": "https://example.com/",
 		"bodyRewrite": {
 			"<h1>Example Domain</h1>": "<h1>Example Domain Hijacked</h1>"
 		}
 	},
-	"self-ping": {
+	{
+		"id": "self-ping",
 		"url": "http://localhost:8080/ping",
 		"bodyRewrite": {
 			"Works!": "It works!",
 			"Now is:": "Current time is:"
 		}
 	}
-}
+]

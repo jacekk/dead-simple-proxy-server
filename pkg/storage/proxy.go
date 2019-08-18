@@ -8,20 +8,21 @@ import (
 )
 
 // GetProxyConfigBySlug - returns URL based on given slug
-func GetProxyConfigBySlug(slug string) (ConfigItem, error) {
-	var item ConfigItem
+func GetProxyConfigBySlug(slug string) (Item, error) {
 	config, err := readConfig()
 	if err != nil {
 		log.Printf("%+v", errors.Wrap(err, "failed to read and parse proxy config"))
-		return item, err
+		return Item{}, err
 	}
 
-	item, isFound := config[slug]
-	if !isFound {
-		errMsg := fmt.Sprintf("failed to find proxy config for %q slug", slug)
-		log.Print(errMsg)
-		return item, errors.New(errMsg)
+	for _, item := range config {
+		if item.ID == slug {
+			return item, nil
+		}
 	}
 
-	return item, nil
+	errMsg := fmt.Sprintf("failed to find proxy config for %q slug", slug)
+	log.Print(errMsg)
+
+	return Item{}, errors.New(errMsg)
 }

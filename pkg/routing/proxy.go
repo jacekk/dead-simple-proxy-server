@@ -29,7 +29,7 @@ func isSlugValid(slug string) error {
 func initURLProxy(
 	ctx *gin.Context,
 	parsedURL *url.URL,
-	config storage.ConfigItem,
+	config storage.Item,
 ) {
 	director := func(req *http.Request) {
 		req.Host = "" // this is required for some unknown reasons
