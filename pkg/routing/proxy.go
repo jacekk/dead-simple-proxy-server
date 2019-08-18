@@ -108,8 +108,7 @@ func readCachedResponse(ctx *gin.Context, item storage.Item, parsedURL *url.URL)
 
 	headers, err := ioutil.ReadFile(headersPath)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to read headers from cache --> %s.", err)
-		ctx.String(http.StatusInternalServerError, msg)
+		ctx.String(http.StatusInternalServerError, "Failed to read headers from cache.")
 		return
 	}
 
@@ -127,8 +126,7 @@ func readCachedResponse(ctx *gin.Context, item storage.Item, parsedURL *url.URL)
 
 	body, err := ioutil.ReadFile(bodyPath)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to read body from cache --> %s.", err)
-		ctx.String(http.StatusInternalServerError, msg)
+		ctx.String(http.StatusInternalServerError, "Failed to read body from cache.")
 		return
 	}
 
