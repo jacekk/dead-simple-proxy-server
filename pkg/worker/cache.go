@@ -42,6 +42,7 @@ func refreshRandomCache(loggr *loggerImpl) error {
 
 func refreshConfigItem(loggr *loggerImpl, item storage.Item) error {
 	loggr.Info("Refreshing '%s' ...", item.ID)
+	startTime := time.Now()
 	resp, err := http.Get(item.URL)
 	if err != nil {
 		return errors.Wrap(err, "failed making get request")
@@ -75,7 +76,8 @@ func refreshConfigItem(loggr *loggerImpl, item storage.Item) error {
 		return errors.Wrap(err, "failed writing headers to cache")
 	}
 
-	loggr.Info("Refreshed '%s'", item.ID)
+	endTime := time.Now()
+	loggr.Info("Refreshed '%s' in %s", item.ID, endTime.Sub(startTime))
 
 	return nil
 }
