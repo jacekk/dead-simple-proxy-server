@@ -3,6 +3,9 @@
 help:
 	@grep '^[^#\.[:space:]].*:' Makefile | tr -d ':'
 
+clear-cache:
+	rm -rf ./cache/*.txt
+
 build:
 	go build cmd/main.go
 
