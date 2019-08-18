@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"math/rand"
@@ -55,7 +56,9 @@ func refreshConfigItem(loggr *loggerImpl, item storage.Item) error {
 	if err != nil {
 		return errors.Wrap(err, "failed reading body")
 	}
-	// @todo rewrite body
+	for from, to := range item.BodyRewrite {
+		body = bytes.Replace(body, []byte(from), []byte(to), -1)
+	}
 	err = ioutil.WriteFile(bodyPath, body, 0644)
 	if err != nil {
 		return errors.Wrap(err, "failed writing body to cache")
