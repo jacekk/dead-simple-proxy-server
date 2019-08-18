@@ -2,10 +2,10 @@
 
 Almost dead simple.
 
-First iteration just allowed to configure urls to redirect to.
-The next to rewrite body content of proxied urls.
+First iteration just allowed to configure urls to serve content from.
+The next one to rewrite body content of proxied urls.
 The current version allows to precache urls based on configured interval.
-In case of errors while refreshing the cache, the last succesful response is being served.
+In case of errors while refreshing the cache, the last successful response is being served.
 
 ### Requirements
 

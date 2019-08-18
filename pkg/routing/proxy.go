@@ -29,8 +29,8 @@ func isSlugValid(slug string) error {
 
 func initURLProxy(
 	ctx *gin.Context,
-	parsedURL *url.URL,
 	config storage.Item,
+	parsedURL *url.URL,
 ) {
 	director := func(req *http.Request) {
 		req.Host = "" // this is required for some unknown reasons
@@ -99,16 +99,32 @@ func getProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
-	initURLProxy(ctx, parsedURL, storedItem)
+	initURLProxy(ctx, storedItem, parsedURL)
 }
 
-func readCachedResponse(ctx *gin.Context, item storage.Item, parsedURL *url.URL) {
+func readCachedResponse(
+	ctx *gin.Context,
+	item storage.Item,
+	parsedURL *url.URL,
+) {
 	bodyPath := storage.SlugCachePath(item.ID, "body")
 	headersPath := storage.SlugCachePath(item.ID, "headers")
 
+	body, err := ioutil.ReadFile(bodyPath)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, "Failed to read content from cache.")
+		return
+	}
+
+	gzipped, err := compression.GzipBytes(body)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, "Failed to gzip cached content.")
+		return
+	}
+
 	headers, err := ioutil.ReadFile(headersPath)
 	if err != nil {
-		ctx.String(http.StatusInternalServerError, "Failed to read headers from cache.")
+		ctx.String(http.StatusInternalServerError, "Failed to read cached headers.")
 		return
 	}
 
@@ -124,14 +140,6 @@ func readCachedResponse(ctx *gin.Context, item storage.Item, parsedURL *url.URL)
 		ctx.Writer.Header().Set(key, value[0])
 	}
 
-	body, err := ioutil.ReadFile(bodyPath)
-	if err != nil {
-		ctx.String(http.StatusInternalServerError, "Failed to read body from cache.")
-		return
-	}
-
-	body, err = compression.GzipBytes(body)
 	ctx.Writer.Header().Set("Content-Encoding", "gzip")
-	bodyString := string(body)
-	ctx.String(http.StatusOK, bodyString)
+	ctx.String(http.StatusOK, string(gzipped))
 }
