@@ -34,9 +34,9 @@ func LoadEnvs(projectDir string) {
 	// Gitignored. Has precedence over `dist.env`, but NOT over system ENVs.
 	err := godotenv.Load(filepath.Join(projectDir, customEnvsFile))
 	if err != nil {
-		log.Printf("File '%s' has NOT been loaded.", customEnvsFile)
+		fmt.Fprintf(os.Stdout, "File '%s' has NOT been loaded. \n", customEnvsFile)
 	} else {
-		fmt.Fprintf(os.Stdout, "File '%s' has been loaded.", customEnvsFile)
+		fmt.Fprintf(os.Stdout, "File '%s' has been loaded. \n", customEnvsFile)
 	}
 
 	// Defaults. Under VCS.
@@ -44,6 +44,6 @@ func LoadEnvs(projectDir string) {
 	if err != nil {
 		log.Fatalf("File '%s' is not present. It should contain all used ENVs, which could be overwritten by system ENVs.", defaultEnvsFile)
 	} else {
-		fmt.Fprintf(os.Stdout, "File '%s' has been loaded.", defaultEnvsFile)
+		fmt.Fprintf(os.Stdout, "File '%s' has been loaded. \n", defaultEnvsFile)
 	}
 }
