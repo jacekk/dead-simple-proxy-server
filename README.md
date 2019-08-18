@@ -32,3 +32,7 @@ In case of errors while refreshing the cache, the last successful response is be
 1. `git pull`
 1. `make build`
 1. `pm2 restart dead-simple-proxy-server`
+
+### License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
