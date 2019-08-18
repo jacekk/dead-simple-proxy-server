@@ -22,7 +22,7 @@ In case of errors while refreshing the cache, the last successful response is be
 
 ### First release
 
-1. `git checkout git@github.com:jacekk/dead-simple-proxy-server.git`
+1. `git clone https://github.com/jacekk/dead-simple-proxy-server`
 1. `cd dead-simple-proxy-server`
 1. `make build`
 1. `pm2 start`
