@@ -1,14 +1,17 @@
 package worker
 
 import (
+	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"os"
+	"net/http/httputil"
 	"time"
 
 	"github.com/jacekk/dead-simple-proxy-server/pkg/storage"
 	"github.com/pkg/errors"
 )
+
+const isBodyCached = true
 
 var random *rand.Rand
 
@@ -30,7 +33,7 @@ func refreshRandomCache(loggr *loggerImpl) error {
 	randomItem := cached[randomIndex]
 	err = refreshConfigItem(loggr, randomItem)
 	if err != nil {
-		return errors.Wrapf(err, "failed refreshing '%s' item", randomItem.URL)
+		return errors.Wrapf(err, "failed refreshing '%s' ", randomItem.ID)
 	}
 
 	return nil
@@ -45,13 +48,12 @@ func refreshConfigItem(loggr *loggerImpl, item storage.Item) error {
 	defer resp.Body.Close()
 
 	cachePath := storage.SlugCachePath(item.ID)
-	cache, err := os.Create(cachePath)
+	body, err := httputil.DumpResponse(resp, isBodyCached)
 	if err != nil {
-		return errors.Wrap(err, "failed creating cache")
+		return errors.Wrap(err, "failed dumping reponse")
 	}
-	defer cache.Close()
-
-	err = resp.Write(cache)
+	// @todo rewrite body
+	err = ioutil.WriteFile(cachePath, body, 0644)
 	if err != nil {
 		return errors.Wrap(err, "failed writing to cache")
 	}
