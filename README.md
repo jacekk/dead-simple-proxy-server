@@ -25,12 +25,14 @@ In case of errors while refreshing the cache, the last successful response is be
 1. `git clone https://github.com/jacekk/dead-simple-proxy-server`
 1. `cd dead-simple-proxy-server`
 1. `make build`
-1. `pm2 start`
+1. `pm2 start ecosystem.config.js`
 
 ### Update
 
 1. `git pull`
+1. `pm2 stop dead-simple-proxy-server`
 1. `make build`
+1. `pm2 reload ecosystem.config.js`
 1. `pm2 restart dead-simple-proxy-server`
 
 ### License
