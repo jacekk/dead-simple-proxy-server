@@ -27,53 +27,6 @@ func isSlugValid(slug string) error {
 	)
 }
 
-func initURLProxy(
-	ctx *gin.Context,
-	config storage.Item,
-	parsedURL *url.URL,
-) {
-	director := func(req *http.Request) {
-		req.Host = "" // this is required for some unknown reasons
-		req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
-		req.URL.Host = parsedURL.Host
-		req.URL.Path = parsedURL.Path
-		req.URL.RawQuery = parsedURL.RawQuery
-		req.URL.Scheme = parsedURL.Scheme
-	}
-	responseModifier := func(resp *http.Response) error {
-		isCompressed := helpers.IsResponseCompressed(resp)
-		body, err := helpers.ReadResponseBody(resp)
-		if err != nil {
-			return err
-		}
-		if isCompressed {
-			body, err = compression.UngzipBytes(body)
-			if err != nil {
-				return err
-			}
-		}
-		for from, to := range config.BodyRewrite {
-			body = bytes.Replace(body, []byte(from), []byte(to), -1)
-		}
-		if isCompressed {
-			body, err = compression.GzipBytes(body)
-			if err != nil {
-				return err
-			}
-		}
-		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
-		if !isCompressed {
-			resp.ContentLength = int64(len(body))
-			resp.Header.Set("Content-Length", strconv.Itoa(len(body)))
-		}
-
-		return nil
-	}
-
-	proxy := &httputil.ReverseProxy{Director: director, ModifyResponse: responseModifier}
-	proxy.ServeHTTP(ctx.Writer, ctx.Request)
-}
-
 func getProxyBySlug(ctx *gin.Context) {
 	slug := ctx.Param("slug")
 	if err := isSlugValid(slug); err != nil {
@@ -142,4 +95,51 @@ func readCachedResponse(
 
 	ctx.Writer.Header().Set("Content-Encoding", "gzip")
 	ctx.String(http.StatusOK, string(gzipped))
+}
+
+func initURLProxy(
+	ctx *gin.Context,
+	config storage.Item,
+	parsedURL *url.URL,
+) {
+	director := func(req *http.Request) {
+		req.Host = "" // this is required for some unknown reasons
+		req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
+		req.URL.Host = parsedURL.Host
+		req.URL.Path = parsedURL.Path
+		req.URL.RawQuery = parsedURL.RawQuery
+		req.URL.Scheme = parsedURL.Scheme
+	}
+	responseModifier := func(resp *http.Response) error {
+		isCompressed := helpers.IsResponseCompressed(resp)
+		body, err := helpers.ReadResponseBody(resp)
+		if err != nil {
+			return err
+		}
+		if isCompressed {
+			body, err = compression.UngzipBytes(body)
+			if err != nil {
+				return err
+			}
+		}
+		for from, to := range config.BodyRewrite {
+			body = bytes.Replace(body, []byte(from), []byte(to), -1)
+		}
+		if isCompressed {
+			body, err = compression.GzipBytes(body)
+			if err != nil {
+				return err
+			}
+		}
+		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
+		if !isCompressed {
+			resp.ContentLength = int64(len(body))
+			resp.Header.Set("Content-Length", strconv.Itoa(len(body)))
+		}
+
+		return nil
+	}
+
+	proxy := &httputil.ReverseProxy{Director: director, ModifyResponse: responseModifier}
+	proxy.ServeHTTP(ctx.Writer, ctx.Request)
 }
