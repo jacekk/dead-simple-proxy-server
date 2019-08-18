@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -34,7 +36,7 @@ func LoadEnvs(projectDir string) {
 	if err != nil {
 		log.Printf("File '%s' has NOT been loaded.", customEnvsFile)
 	} else {
-		log.Printf("File '%s' has been loaded.", customEnvsFile)
+		fmt.Fprintf(os.Stdout, "File '%s' has been loaded.", customEnvsFile)
 	}
 
 	// Defaults. Under VCS.
@@ -42,6 +44,6 @@ func LoadEnvs(projectDir string) {
 	if err != nil {
 		log.Fatalf("File '%s' is not present. It should contain all used ENVs, which could be overwritten by system ENVs.", defaultEnvsFile)
 	} else {
-		log.Printf("File '%s' has been loaded.", defaultEnvsFile)
+		fmt.Fprintf(os.Stdout, "File '%s' has been loaded.", defaultEnvsFile)
 	}
 }
