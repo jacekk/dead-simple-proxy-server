@@ -10,11 +10,25 @@ In case of errors while refreshing the cache, the last succesful response is bei
 ### Requirements
 
 * [Go](https://golang.org/doc/install) [ >=1.12 ]
+* [pm2](https://pm2.keymetrics.io/) [ >=3.5 ]
 
-### Running
+### Development
 
 1. `cp dist.env .env` -- and edit if necessary
-1. `make serve &`
+1. `make run-all &`
 1. `http localhost:8080/proxy/example` or `curl localhost:8080/proxy/example`
 1. `fg`
 1. CTRL + C
+
+### First release
+
+1. `git checkout git@github.com:jacekk/dead-simple-proxy-server.git`
+1. `cd dead-simple-proxy-server`
+1. `make build`
+1. `pm2 start`
+
+### Update
+
+1. `git pull`
+1. `make build`
+1. `pm2 restart dead-simple-proxy-server`
