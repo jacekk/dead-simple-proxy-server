@@ -2,5 +2,7 @@
 /go.sum
 /main
 
+/cache/*.*
+!/cache/.gitkeep
 /storage/*.json
 !/storage/*.dist.json

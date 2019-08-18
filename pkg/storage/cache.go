@@ -1,6 +1,11 @@
 package storage
 
-import "github.com/pkg/errors"
+import (
+	"path"
+
+	"github.com/jacekk/dead-simple-proxy-server/pkg/helpers"
+	"github.com/pkg/errors"
+)
 
 // GetCached -
 func GetCached() (Items, error) {
@@ -17,4 +22,11 @@ func GetCached() (Items, error) {
 	}
 
 	return cached, nil
+}
+
+// SlugCachePath -
+func SlugCachePath(slug string) string {
+	baseDir := helpers.GetProjectDir()
+
+	return path.Join(baseDir, "cache", slug+".txt")
 }

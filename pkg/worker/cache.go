@@ -2,6 +2,8 @@ package worker
 
 import (
 	"math/rand"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/jacekk/dead-simple-proxy-server/pkg/storage"
@@ -35,7 +37,26 @@ func refreshRandomCache(loggr *loggerImpl) error {
 }
 
 func refreshConfigItem(loggr *loggerImpl, item storage.Item) error {
-	loggr.Info("Refreshing '%s'", item.ID)
+	loggr.Info("Refreshing '%s' ...", item.ID)
+	resp, err := http.Get(item.URL)
+	if err != nil {
+		return errors.Wrap(err, "failed making get request")
+	}
+	defer resp.Body.Close()
+
+	cachePath := storage.SlugCachePath(item.ID)
+	cache, err := os.Create(cachePath)
+	if err != nil {
+		return errors.Wrap(err, "failed creating cache")
+	}
+	defer cache.Close()
+
+	err = resp.Write(cache)
+	if err != nil {
+		return errors.Wrap(err, "failed writing to cache")
+	}
+
+	loggr.Info("Refreshed '%s'", item.ID)
 
 	return nil
 }
