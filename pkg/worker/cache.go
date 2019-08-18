@@ -1,10 +1,10 @@
 package worker
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"net/http/httputil"
 	"time"
 
 	"github.com/jacekk/dead-simple-proxy-server/pkg/storage"
@@ -47,15 +47,29 @@ func refreshConfigItem(loggr *loggerImpl, item storage.Item) error {
 	}
 	defer resp.Body.Close()
 
-	cachePath := storage.SlugCachePath(item.ID)
-	body, err := httputil.DumpResponse(resp, isBodyCached)
+	bodyPath := storage.SlugCachePath(item.ID, "body")
+	headersPath := storage.SlugCachePath(item.ID, "headers")
+
+	// cache body
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return errors.Wrap(err, "failed dumping reponse")
+		return errors.Wrap(err, "failed reading body")
 	}
 	// @todo rewrite body
-	err = ioutil.WriteFile(cachePath, body, 0644)
+	err = ioutil.WriteFile(bodyPath, body, 0644)
 	if err != nil {
-		return errors.Wrap(err, "failed writing to cache")
+		return errors.Wrap(err, "failed writing body to cache")
+	}
+
+	// cache headers
+	resp.Header.Set("X-proxy-cached-at", time.Now().Format(http.TimeFormat))
+	headers, err := json.Marshal(resp.Header)
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize headers")
+	}
+	err = ioutil.WriteFile(headersPath, headers, 0644)
+	if err != nil {
+		return errors.Wrap(err, "failed writing headers to cache")
 	}
 
 	loggr.Info("Refreshed '%s'", item.ID)

@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/jacekk/dead-simple-proxy-server/pkg/helpers"
@@ -25,8 +26,9 @@ func GetCached() (Items, error) {
 }
 
 // SlugCachePath -
-func SlugCachePath(slug string) string {
+func SlugCachePath(slug, fileType string) string {
 	baseDir := helpers.GetProjectDir()
+	fileName := fmt.Sprintf("%s.%s.txt", slug, fileType)
 
-	return path.Join(baseDir, "cache", slug+".txt")
+	return path.Join(baseDir, "cache", fileName)
 }

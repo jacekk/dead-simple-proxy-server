@@ -2,6 +2,7 @@ package routing
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -93,5 +94,46 @@ func getProxyBySlug(ctx *gin.Context) {
 		return
 	}
 
+	if storedItem.IsCacheEnabled {
+		readCachedResponse(ctx, storedItem, parsedURL)
+		return
+	}
+
 	initURLProxy(ctx, parsedURL, storedItem)
+}
+
+func readCachedResponse(ctx *gin.Context, item storage.Item, parsedURL *url.URL) {
+	bodyPath := storage.SlugCachePath(item.ID, "body")
+	headersPath := storage.SlugCachePath(item.ID, "headers")
+
+	headers, err := ioutil.ReadFile(headersPath)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to read headers from cache --> %s.", err)
+		ctx.String(http.StatusInternalServerError, msg)
+		return
+	}
+
+	var parsedHeaders http.Header
+	err = json.Unmarshal(headers, &parsedHeaders)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to parse headers from cache --> %s.", err)
+		ctx.String(http.StatusInternalServerError, msg)
+		return
+	}
+
+	for key, value := range parsedHeaders {
+		ctx.Writer.Header().Set(key, value[0])
+	}
+
+	body, err := ioutil.ReadFile(bodyPath)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to read body from cache --> %s.", err)
+		ctx.String(http.StatusInternalServerError, msg)
+		return
+	}
+
+	body, err = compression.GzipBytes(body)
+	ctx.Writer.Header().Set("Content-Encoding", "gzip")
+	bodyString := string(body)
+	ctx.String(http.StatusOK, bodyString)
 }
