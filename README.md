@@ -9,7 +9,7 @@ In case of errors while refreshing the cache, the last successful response is be
 
 ### Requirements
 
-* [Go](https://golang.org/doc/install) [ >=1.12 ]
+* [Go](https://golang.org/doc/install) [ =1.12 ]
 * [pm2](https://pm2.keymetrics.io/) [ >=3.5 ]
 
 ### Development
